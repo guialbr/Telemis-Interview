@@ -13,23 +13,30 @@ public class Frame {
     private static final int MAX_PINS = 15;
     private static final int MAX_THROWS = 3;
 
-    private final List<Integer> throwList;
+    private List<Integer> throwList;
     private boolean isCompleted;
-    // private boolean isLastFrame; //Not used
+    private final boolean isLastFrame;
     
     public Frame() {
         this.throwList = new ArrayList<>();
         this.isCompleted = false;
+        this.isLastFrame = false;
+    }
+
+    public Frame(boolean isLastFrame) {
+        this.throwList = new ArrayList<>();
+        this.isCompleted = false;
+        this.isLastFrame = isLastFrame;
     }
     
     public void addThrow(int pins) {
-        if (isCompleted || throwList.size() >= MAX_THROWS) {
+        if (isCompleted && !isLastFrame) {
             throw new IllegalStateException("Frame is finished, cannot add more throws");
         }
         if (pins < 0 || pins > MAX_PINS) {
             throw new IllegalArgumentException("Invalid number of pins : " + pins);
         }
-        if (!throwList.isEmpty() && getPinsKnockedDown() + pins > MAX_PINS) {
+        if (!throwList.isEmpty() && getPinsKnockedDown() + pins > MAX_PINS && !isLastFrame) {
             throw new IllegalArgumentException("Total pins cannot exceed " + MAX_PINS);
         }
         
@@ -38,8 +45,14 @@ public class Frame {
     }
     
     private void updateFrameStatus() {
-        if (isStrike() || getPinsKnockedDown() == MAX_PINS || throwList.size() == MAX_THROWS) {
-            isCompleted = true;
+        if (isLastFrame) {
+            if (throwList.size() == 3 || (throwList.size() == 2 && getPinsKnockedDown() < MAX_PINS)) {
+                isCompleted = true;
+            }
+        } else {
+            if (isStrike() || getPinsKnockedDown() == MAX_PINS || throwList.size() == MAX_THROWS) {
+                isCompleted = true;
+            }
         }
     }
     

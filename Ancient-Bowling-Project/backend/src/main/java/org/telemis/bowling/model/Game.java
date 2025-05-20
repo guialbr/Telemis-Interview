@@ -52,19 +52,22 @@ public class Game {
     public void addThrow(int pins) {
         if (!isStarted) {
             throw new IllegalStateException("Game has not started");
+        } else if (isGameComplete()) {
+            throw new IllegalStateException("Game is complete, cannot add more throws.");
         }
-
         Player currentPlayer = getCurrentPlayer();
+        currentPlayer.ensureFreshFrame();
         currentPlayer.addThrow(pins);
-
         if (currentPlayer.getCurrentFrame().isCompleted()) {
             moveToNextPlayer();
         }
     }
 
     private void moveToNextPlayer() {
+        int startIndex = currentPlayerIndex;
         do {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            if (currentPlayerIndex == startIndex) break;
         } while (isGameComplete() && !getCurrentPlayer().needsBonusThrows());
     }
     

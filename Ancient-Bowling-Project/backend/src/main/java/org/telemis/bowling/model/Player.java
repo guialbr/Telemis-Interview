@@ -20,23 +20,43 @@ public class Player {
         this.currentFrame = new Frame();
         frames.add(currentFrame);
     }
-    
+
+    /**
+     * Ensures a new frame is started if the previous one is completed.
+     * Must be called before addThrow().
+     * Only creates a new frame if not on the last frame; bonus throws for the last frame are added to the last frame.
+     */
+    public void ensureFreshFrame() {
+        if (currentFrame.isCompleted() && frames.size() < MAX_FRAMES) {
+            if (frames.size() == MAX_FRAMES - 1) {
+                currentFrame = new Frame(true); 
+            } else {
+                currentFrame = new Frame();
+            }
+            frames.add(currentFrame);
+        }
+        
+        // If on the last frame, do not create a new frame; bonus throws will be added to the last frame
+    }
+
+    /**
+     * Adds a throw to the current frame.
+     * Call ensureFreshFrame() before this method.
+     * If on the last frame, all throws (including bonus) are added to the last frame.
+     */
     public void addThrow(int pins) {
+        ensureFreshFrame(); // Create a new frame if the previous one is completed
         if (isGameComplete()) {
             if (!needsBonusThrows()) {
                 throw new IllegalStateException("Game is complete");
             }
         }
-
-        if (currentFrame.isCompleted()) {
-            if (frames.size() >= MAX_FRAMES && !needsBonusThrows()) {
-                throw new IllegalStateException("Cannot add more frames");
-            }
-            currentFrame = new Frame();
-            frames.add(currentFrame);
+        // If on the last frame, always add throws to the last frame (including bonus throws)
+        if (frames.size() == MAX_FRAMES) {
+            frames.get(MAX_FRAMES - 1).addThrow(pins);
+        } else {
+            currentFrame.addThrow(pins);
         }
-        
-        currentFrame.addThrow(pins);
     }
     
     /**
@@ -65,11 +85,13 @@ public class Player {
     
     private int calculateStrikeBonus(int frameIndex) {
         List<Integer> nextThrows = getNextThrows(frameIndex, 3);
+        System.out.println("Debug: StrikeBonus calculated: " + nextThrows);
         return nextThrows.stream().mapToInt(Integer::intValue).sum();
     }
     
     private int calculateSpareBonus(int frameIndex) {
         List<Integer> nextThrows = getNextThrows(frameIndex, 2);
+        System.out.println("Debug: SpareBonus calculated: " + nextThrows);
         return nextThrows.stream().mapToInt(Integer::intValue).sum();
     }
     
@@ -95,9 +117,18 @@ public class Player {
     }
     
     public boolean isGameComplete() {
-        return frames.size() >= MAX_FRAMES &&
-                frames.get(MAX_FRAMES - 1).isCompleted() &&
-               !needsBonusThrows();
+        boolean enoughFrames = frames.size() >= MAX_FRAMES;
+        boolean lastCompleted = enoughFrames && frames.get(MAX_FRAMES - 1).isCompleted();
+        boolean noBonus = !needsBonusThrows();
+        boolean result = enoughFrames && lastCompleted && noBonus;
+        System.out.println("DEBUG: Player " + name + " isGameComplete: " + result +
+                           " (frames: " + frames.size() +
+                           ", last completed: " + lastCompleted +
+                           ", needsBonus: " + needsBonusThrows() + ")");
+        return result;
+        // return frames.size() >= MAX_FRAMES &&
+        //         frames.get(MAX_FRAMES - 1).isCompleted() &&
+        //        !needsBonusThrows();
     }
 
     //In case of a strike or spare in player's last frame 
@@ -127,4 +158,4 @@ public class Player {
     public Frame getCurrentFrame() {
         return currentFrame;
     }
-} 
+}

@@ -37,8 +37,12 @@ public class ConsoleGame {
     private void playGame() {
         while (!game.isGameComplete()) {
             Player currentPlayer = game.getCurrentPlayer();
+            // BUG NOTE: If the previous frame is completed, we must ensure a new frame is started before asking for input.
+            // Otherwise, the UI will show the remaining pins from the old frame, not a fresh 15.
+            currentPlayer.ensureFreshFrame();
             Frame currentFrame = currentPlayer.getCurrentFrame();
-            int frameNumber = currentPlayer.getFrames().size();
+            long completedFrames = currentPlayer.getFrames().stream().filter(Frame::isCompleted).count();
+            int frameNumber = (int) completedFrames + 1;
 
             System.out.println("\n" + "=".repeat(40));
             System.out.printf("Current Player: %s (Frame %d)\n", currentPlayer.getName(), frameNumber);
