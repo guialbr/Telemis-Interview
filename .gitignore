@@ -1,8 +1,11 @@
 # Compiled class file
 *.class
+Ancient-Bowling-Project/backend/target
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
+Ancient-Bowling-Project/backend/.idea
+.idea
+/.idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
@@ -35,3 +38,5 @@ replay_pid*
 
 ### Mac OS ###
 .DS_Store
+TMRHEDemo on macOS(1).pdf.crdownload.pdf
+TMRHEDemo-install.dmg

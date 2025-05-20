@@ -92,10 +92,9 @@ public class Game {
         for (Player player : players) {
             scores.add(new PlayerScore(player.getName(), player.calculateScore(), player));
         }
-        scores.sort((a, b) -> b.score() - a.score()); // Sort by score descending
+        scores.sort((a, b) -> b.score() - a.score()); // Sort by descending order
         return scores;
     }
     
-    // Record to represent player scores for the scoreboard
     public record PlayerScore(String name, int score, Player player) {}
 } 
