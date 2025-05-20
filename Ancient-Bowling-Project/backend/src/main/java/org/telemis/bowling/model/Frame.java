@@ -13,12 +13,14 @@ public class Frame {
     private static final int MAX_PINS = 15;
     private static final int MAX_THROWS = 3;
 
-    private List<Integer> throwList;
+    private final List<Integer> throwList;
     private boolean isCompleted;
+
+
     private final boolean isLastFrame;
     
     public Frame() {
-        this.throwList = new ArrayList<>();
+        this.throwList = new ArrayList<>(3);
         this.isCompleted = false;
         this.isLastFrame = false;
     }
@@ -43,19 +45,50 @@ public class Frame {
         throwList.add(pins);
         updateFrameStatus();
     }
-    
-    private void updateFrameStatus() {
-        if (isLastFrame) {
-            if (throwList.size() == 3 || (throwList.size() == 2 && getPinsKnockedDown() < MAX_PINS)) {
-                isCompleted = true;
-            }
+
+    public void updateFrameStatus() {
+        if (isLastFrame()) {
+            isCompleted = checkLastFrameCompletion();
         } else {
-            if (isStrike() || getPinsKnockedDown() == MAX_PINS || throwList.size() == MAX_THROWS) {
-                isCompleted = true;
-            }
+            isCompleted = checkRegularFrameCompletion();
+        }
+        if (isCompleted) {
+            System.out.println("DEBUG: Frame completed. Throws: " + throwList + ", Total: " + getPinsKnockedDown());
         }
     }
-    
+
+    private boolean checkLastFrameCompletion() {
+        int throwsCount = getThrows().size();
+
+        return (isStrike() && throwsCount == MAX_THROWS + 1) ||
+                (isSpareOnFirstTwoThrows() && throwsCount == MAX_THROWS + 1) ||
+                (isSpareOnThreeThrows() && throwsCount == MAX_THROWS + 2) ||
+                (isRegularFrame() && throwsCount == MAX_THROWS);
+    }
+
+    private boolean checkRegularFrameCompletion() {
+        return isStrike() || getPinsKnockedDown() == MAX_PINS || getThrows().size() == MAX_THROWS;
+    }
+
+
+    private boolean isSpareOnFirstTwoThrows() {
+        List<Integer> throws_ = getThrows();
+        return throws_.size() >= 2 &&
+                (throws_.get(0) + throws_.get(1) == MAX_PINS) &&
+                !isStrike();
+    }
+
+    private boolean isSpareOnThreeThrows() {
+        List<Integer> throws_ = getThrows();
+        return throws_.size() >= 3 &&
+                (throws_.get(0) + throws_.get(1) + throws_.get(2) == MAX_PINS) &&
+                !isStrike();
+    }
+
+    private boolean isRegularFrame() {
+        return !isStrike() && !isSpare();
+    }
+
     public boolean isStrike() {
         return !throwList.isEmpty() && throwList.get(0) == MAX_PINS;
     }
@@ -68,13 +101,16 @@ public class Frame {
         return throwList.stream().mapToInt(Integer::intValue).sum();
     }
 
-    //CHECK FOR BONUS THROW IMPLEMENTATION ON LAST FRAME
     public List<Integer> getThrows() {
         return new ArrayList<>(throwList);
     }
 
     public boolean isCompleted() {
         return isCompleted;
+    }
+
+    public boolean isLastFrame() {
+        return isLastFrame;
     }
 
     public int getRemainingPins() {

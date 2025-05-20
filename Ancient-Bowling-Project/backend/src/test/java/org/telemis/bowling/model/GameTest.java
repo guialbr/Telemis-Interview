@@ -88,16 +88,7 @@ class GameTest {
                 5, 5, 3,  // Player 2, Frame 5
         };
         for (int pins : throwsSequence) {
-            if (game.isGameComplete()) {
-                System.out.println("Game is complete, breaking loop.");
-                break;
-            }
-            try {
-                game.addThrow(pins);
-            } catch (Exception e) {
-                e.printStackTrace();
-                break; // Stop the loop if an exception occurs
-            }
+            game.addThrow(pins);
         }
         System.err.println("P1 and P2 have completed 5 frames");
         assertTrue(game.isGameComplete());
@@ -137,7 +128,6 @@ class GameTest {
         game.addThrow(3);
         // Player 1 should get bonus throws
         assertFalse(game.isGameComplete());
-        //assertTrue(game.getCurrentPlayer().getCurrentFrame().isStrike());
         // Complete bonus throws for Player 1
         game.addThrow(10);
         game.addThrow(5);
@@ -163,39 +153,71 @@ class GameTest {
      * Test the score calculation for a specific score chart example (see bowling score example).
      */
     @Test
-    void scoreChartExample1() {
+    void scoreChartExample() {
         System.out.println("DEBUG: Start scoreChartExample1");
         game.addPlayer("Player 1");
-        game.addPlayer("Player 2"); // Add a dummy player to satisfy min players
+        game.addPlayer("Player 2");
         game.start();
         // Player 1's throws (frame by frame):
         // Frame 1: 8, 1, 1
         game.addThrow(8); // 1st throw
         game.addThrow(1); // 2nd throw
         game.addThrow(1); // 3rd throw
-        // Frame 2: 8, 7 (spare)
-        game.addThrow(8); // 1st throw
-        game.addThrow(7); // 2nd throw (spare, 8+7=15)
-        // Frame 3: 1, 2, 1
+
+        //Player 2:
+        game.addThrow(15); //p2 Strike
+
+        // Frame 2
+        game.addThrow(8); // p1 1st throw
+        game.addThrow(7); // p1 2nd throw (spare, 8+7=15)
+
+        game.addThrow(8);
+        game.addThrow(1);
+        game.addThrow(2);
+
+        // Frame 3:
         game.addThrow(1);
         game.addThrow(2);
         game.addThrow(1);
+
+        game.addThrow(1);
+        game.addThrow(2);
+        game.addThrow(12); //p2 Spare
+
         // Frame 4: 15 (strike)
         game.addThrow(15);
+
+        game.addThrow(6);
+        game.addThrow(4);
+        game.addThrow(1);
+
         // Frame 5: 1, 2, 1
         game.addThrow(1);
         game.addThrow(2);
         game.addThrow(1);
-        // Get Player 1's frames and scores
+
+        game.addThrow(15);
+        game.addThrow(8);
+        game.addThrow(2);
+        game.addThrow(3);
+
         Player player1 = game.getScoreboard().get(0).player();
-        var frames = player1.getFrames();
-        assertEquals(5, frames.size());
+        Player player2 = game.getScoreboard().get(1).player();
+        var framesFromPlayer1 = player1.getFrames();
+        var framesFromPlayer2 = player2.getFrames();
+        assertEquals(5, framesFromPlayer1.size());
         // Check cumulative scores after each frame
         assertEquals(10, player1.calculateScore(1));
         assertEquals(28, player1.calculateScore(2));
         assertEquals(31, player1.calculateScore(3));
         assertEquals(50, player1.calculateScore(4));
         assertEquals(53, player1.calculateScore(5));
-        System.out.println("DEBUG: End scoreChartExample1");
+
+        assertEquals(26, player2.calculateScore(1));
+        assertEquals(37, player2.calculateScore(2));
+        assertEquals(62, player2.calculateScore(3));
+        assertEquals(73, player2.calculateScore(4));
+        assertEquals(101, player2.calculateScore(5));
+        System.out.println("DEBUG: End scoreChartPlayer1");
     }
 } 

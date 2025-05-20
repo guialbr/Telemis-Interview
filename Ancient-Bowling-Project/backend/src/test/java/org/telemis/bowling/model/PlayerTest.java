@@ -29,8 +29,8 @@ class PlayerTest {
         player.addThrow(3);
         player.addThrow(4);
         player.addThrow(5 );
-        assertEquals(27, player.calculateScore(1)); // Strike score should be: 15 + (3 + 4 + 5) = 27
-        assertEquals(39, player.calculateScore(2)); // Strike score should be: frame 1 score + (3 + 4 + 5) = 39
+        assertEquals(27, player.calculateScore(1)); // should be: 15 + (3 + 4 + 5) = 27
+        assertEquals(39, player.calculateScore(2)); // should be: scoreFrame1 + (3 + 4 + 5) = 39
         System.out.println("DEBUG: End testStrikeScore");
     }
 
@@ -45,7 +45,8 @@ class PlayerTest {
         player.addThrow(3);
         
         // Spare score should be: 15 + (5 + 3) + 8 = 31
-        assertEquals(31, player.calculateScore());
+        assertEquals(23, player.calculateScore(1)); // Should be: 15 + (5 + 3) = 23
+        assertEquals(31, player.calculateScore(2));// Should be: scoreFrame1 + (5 + 3) = 31
         System.out.println("DEBUG: End testSpareScore");
     }
 
@@ -106,7 +107,7 @@ class PlayerTest {
     void testBonusThrowsForLastFrameSpare() {
         System.out.println("DEBUG: Start testBonusThrowsForLastFrameSpare");
         // Frames 1-4
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             player.addThrow(5);
             player.addThrow(5);
             player.addThrow(4);
