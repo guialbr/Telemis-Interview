@@ -114,10 +114,10 @@ class PlayerTest {
         }
         // Frame 5 - Spare
         player.addThrow(7);
-        player.addThrow(8);
+        player.addThrow(8); //Spare on 2nd throw
         assertFalse(player.isGameComplete()); // Need bonus throws
-        
-        // Bonus throws
+
+        // Bonus throws        boolean enoughFrames = frames.size() >= MAX_FRAMES;
         player.addThrow(10);
         player.addThrow(5);
         

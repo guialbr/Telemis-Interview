@@ -52,7 +52,7 @@ public class Player {
             }
         }
         // If on the last frame, always add throws to the last frame (including bonus throws)
-        if (frames.size() == MAX_FRAMES) {
+        if (currentFrame.isLastFrame()) {
             frames.get(MAX_FRAMES - 1).addThrow(pins);
         } else {
             currentFrame.addThrow(pins);
@@ -72,7 +72,9 @@ public class Player {
         for (int i = 0; i < frameNumber && i < frames.size(); i++) {
             Frame frame = frames.get(i);
             totalScore += frame.getPinsKnockedDown();
-            if (i < MAX_FRAMES) {
+            
+            // For the last frame, bonus throws are already included in getPinsKnockedDown
+            if (i < MAX_FRAMES - 1) {
                 if (frame.isStrike()) {
                     totalScore += calculateStrikeBonus(i);
                 } else if (frame.isSpare()) {
@@ -117,18 +119,22 @@ public class Player {
     }
     
     public boolean isGameComplete() {
-        boolean enoughFrames = frames.size() >= MAX_FRAMES;
-        boolean lastCompleted = enoughFrames && frames.get(MAX_FRAMES - 1).isCompleted();
-        boolean noBonus = !needsBonusThrows();
-        boolean result = enoughFrames && lastCompleted && noBonus;
-        System.out.println("DEBUG: Player " + name + " isGameComplete: " + result +
-                           " (frames: " + frames.size() +
-                           ", last completed: " + lastCompleted +
-                           ", needsBonus: " + needsBonusThrows() + ")");
+        if (frames.size() < MAX_FRAMES) {
+            return false;
+        }
+        
+        Frame lastFrame = frames.get(MAX_FRAMES - 1);
+        boolean result = lastFrame.isCompleted();
+        
+        if (!result) {
+            System.out.println("DEBUG: Player " + name + " isGameComplete: " + result +
+                    " (frames: " + frames.size() +
+                    ", last frame throws: " + lastFrame.getThrows() +
+                    ", last frame completed: " + lastFrame.isCompleted() +
+                    ", needsBonus: " + needsBonusThrows() + ")");
+        }
+        
         return result;
-        // return frames.size() >= MAX_FRAMES &&
-        //         frames.get(MAX_FRAMES - 1).isCompleted() &&
-        //        !needsBonusThrows();
     }
 
     //In case of a strike or spare in player's last frame 
@@ -136,11 +142,13 @@ public class Player {
         if (frames.size() < MAX_FRAMES) return false;
 
         Frame lastFrame = frames.get(MAX_FRAMES - 1);
-        if (!lastFrame.isCompleted()) return false;
-        
+
+        // For last frame, we need to check if we need bonus throws before checking completion
         if (lastFrame.isStrike()) {
+            // For strike, we need 3 bonus throws
             return getNextThrows(MAX_FRAMES - 1, 3).size() < 3;
         } else if (lastFrame.isSpare()) {
+            // For spare, we need 2 bonus throws
             return getNextThrows(MAX_FRAMES - 1, 2).size() < 2;
         }
         

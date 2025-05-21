@@ -15,20 +15,24 @@ public class Frame {
 
     private final List<Integer> throwList;
     private boolean isCompleted;
-
-
     private final boolean isLastFrame;
+    private boolean wasStrike;  // Track if frame had a strike
+    private boolean wasSpare;   // Track if frame had a spare
     
     public Frame() {
         this.throwList = new ArrayList<>(3);
         this.isCompleted = false;
         this.isLastFrame = false;
+        this.wasStrike = false;
+        this.wasSpare = false;
     }
 
     public Frame(boolean isLastFrame) {
         this.throwList = new ArrayList<>();
         this.isCompleted = false;
         this.isLastFrame = isLastFrame;
+        this.wasStrike = false;
+        this.wasSpare = false;
     }
     
     public void addThrow(int pins) {
@@ -48,6 +52,12 @@ public class Frame {
 
     public void updateFrameStatus() {
         if (isLastFrame()) {
+            // For last frame, preserve strike/spare status
+            if (isStrike()) {
+                wasStrike = true;
+            } else if (isSpare()) {
+                wasSpare = true;
+            }
             isCompleted = checkLastFrameCompletion();
         } else {
             isCompleted = checkRegularFrameCompletion();
@@ -60,10 +70,15 @@ public class Frame {
     private boolean checkLastFrameCompletion() {
         int throwsCount = getThrows().size();
 
-        return (isStrike() && throwsCount == MAX_THROWS + 1) ||
-                (isSpareOnFirstTwoThrows() && throwsCount == MAX_THROWS + 1) ||
-                (isSpareOnThreeThrows() && throwsCount == MAX_THROWS + 2) ||
-                (isRegularFrame() && throwsCount == MAX_THROWS);
+        if (isStrike()) {
+            return throwsCount == MAX_THROWS + 1;
+        } else if (isSpareOnFirstTwoThrows()) {
+            return throwsCount == MAX_THROWS + 1;
+        } else if (isSpareOnThreeThrows()) {
+            return throwsCount == MAX_THROWS + 2;
+        } else {
+            return throwsCount == MAX_THROWS;
+        }
     }
 
     private boolean checkRegularFrameCompletion() {
@@ -73,6 +88,7 @@ public class Frame {
 
     private boolean isSpareOnFirstTwoThrows() {
         List<Integer> throws_ = getThrows();
+        System.out.println("DEBUG isSpareOnFirstTwoThrows FUNCTION CALLED ");
         return throws_.size() >= 2 &&
                 (throws_.get(0) + throws_.get(1) == MAX_PINS) &&
                 !isStrike();
@@ -90,10 +106,16 @@ public class Frame {
     }
 
     public boolean isStrike() {
+        if (isLastFrame() && wasStrike) {
+            return true;
+        }
         return !throwList.isEmpty() && throwList.get(0) == MAX_PINS;
     }
     
     public boolean isSpare() {
+        if (isLastFrame() && wasSpare) {
+            return true;
+        }
         return !isStrike() && throwList.size() >= 2 && getPinsKnockedDown() == MAX_PINS;
     }
 
@@ -114,6 +136,24 @@ public class Frame {
     }
 
     public int getRemainingPins() {
+        if (isLastFrame()) {
+            if (isStrike() && throwList.size() == 1) {
+                // First throw was a strike, reset pins for second throw
+                return MAX_PINS;
+            } else if (isStrike() && throwList.size() == 2) {
+                // Second throw after strike, calculate remaining pins normally
+                return MAX_PINS - throwList.get(1);
+            } else if (isStrike() && throwList.size() == 3) {
+                // Third throw after strike, calculate remaining pins normally
+                return MAX_PINS - throwList.get(2);
+            } else if (isSpare() && throwList.size() == 2) {
+                // First throw of spare, reset pins for second throw
+                return MAX_PINS;
+            } else if (isSpare() && throwList.size() == 3) {
+                // Second throw after spare, calculate remaining pins normally
+                return MAX_PINS - throwList.get(2);
+            }
+        }
         return MAX_PINS - getPinsKnockedDown();
     }
 }
