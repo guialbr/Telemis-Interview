@@ -312,4 +312,23 @@ class FrameTest {
         assertTrue(lastFrame.isCompleted());
         assertEquals(13, lastFrame.getPinsKnockedDown()); // 5 + 5 + 3
     }
+
+    @Test
+    void testLastFrameSpareAllowsBonusThrows() {
+        Frame lastFrame = new Frame(true);
+        // First two throws make a spare
+        lastFrame.addThrow(7);
+        lastFrame.addThrow(8);
+        assertTrue(lastFrame.isSpare());
+        assertFalse(lastFrame.isCompleted()); // Should not be completed yet
+        
+        // First bonus throw
+        lastFrame.addThrow(10);
+        assertFalse(lastFrame.isCompleted()); // Still not completed
+        
+        // Second bonus throw
+        lastFrame.addThrow(5);
+        assertTrue(lastFrame.isCompleted()); // Now completed
+        assertEquals(30, lastFrame.getPinsKnockedDown()); // 15 + 10 + 5
+    }
 } 

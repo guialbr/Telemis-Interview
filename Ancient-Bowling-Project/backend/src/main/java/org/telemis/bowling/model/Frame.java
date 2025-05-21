@@ -12,29 +12,28 @@ import java.util.List;
 public class Frame {
     private static final int MAX_PINS = 15;
     private static final int MAX_THROWS = 3;
+    private static final int BONUS_THROWS_AFTER_SPARE = 2;
+    private static final int BONUS_THROWS_AFTER_STRIKE = 3;
 
     private final List<Integer> throwList;
     private boolean isCompleted;
     private final boolean isLastFrame;
-    private boolean wasStrike;  // Track if frame had a strike
-    private boolean wasSpare;   // Track if frame had a spare
+    private int bonusThrowsCounter;  // Tracks number of bonus throws taken in last frame
     
     public Frame() {
         this.throwList = new ArrayList<>(3);
         this.isCompleted = false;
         this.isLastFrame = false;
-        this.wasStrike = false;
-        this.wasSpare = false;
+        this.bonusThrowsCounter = 0;
     }
 
     public Frame(boolean isLastFrame) {
         this.throwList = new ArrayList<>();
         this.isCompleted = false;
         this.isLastFrame = isLastFrame;
-        this.wasStrike = false;
-        this.wasSpare = false;
+        this.bonusThrowsCounter = 0;
     }
-    
+
     public void addThrow(int pins) {
         if (isCompleted && !isLastFrame) {
             throw new IllegalStateException("Frame is finished, cannot add more throws");
@@ -50,76 +49,68 @@ public class Frame {
         updateFrameStatus();
     }
 
-    public void updateFrameStatus() {
-        if (isLastFrame()) {
-            // For last frame, preserve strike/spare status
-            if (isStrike()) {
-                wasStrike = true;
-            } else if (isSpare()) {
-                wasSpare = true;
+    private void updateFrameStatus() {
+        if (!isLastFrame) {
+            // Regular frame completes on strike, spare, or 3 throws
+            if (isStrike() || isSpare() || throwList.size() == 3) {
+                isCompleted = true;
             }
-            isCompleted = checkLastFrameCompletion();
         } else {
-            isCompleted = checkRegularFrameCompletion();
-        }
-        if (isCompleted) {
-            System.out.println("DEBUG: Frame completed. Throws: " + throwList + ", Total: " + getPinsKnockedDown());
+            // Last frame has special rules for bonus throws
+            if (isStrike()) {
+                // Strike in last frame needs 3 bonus throws
+                isCompleted = throwList.size() == BONUS_THROWS_AFTER_STRIKE + 1;
+            } else if (isSpare()) {
+                // For spare in last frame, we need exactly 2 bonus throws
+                if (throwList.size() == 2) {
+                    // Spare in first two throws
+                    isCompleted = false;
+                    bonusThrowsCounter = 0;
+                } else if (throwList.size() == 3) {
+                    // Spare in three throws
+                    isCompleted = false;
+                    bonusThrowsCounter = 0;
+                } else if (throwList.size() > 3) {
+                    // Count bonus throws (total throws minus the throws that made the spare)
+                    bonusThrowsCounter = throwList.size() - (isFirstTwoThrowsSpare() ? 2 : 3);
+                    // Only complete if we've taken exactly 2 bonus throws
+                    isCompleted = bonusThrowsCounter == BONUS_THROWS_AFTER_SPARE;
+                }
+            } else {
+                // Regular last frame completes after 3 throws
+                isCompleted = throwList.size() == 3;
+            }
         }
     }
 
-    private boolean checkLastFrameCompletion() {
-        int throwsCount = getThrows().size();
-
-        if (isStrike()) {
-            return throwsCount == MAX_THROWS + 1;
-        } else if (isSpareOnFirstTwoThrows()) {
-            return throwsCount == MAX_THROWS + 1;
-        } else if (isSpareOnThreeThrows()) {
-            return throwsCount == MAX_THROWS + 2;
-        } else {
-            return throwsCount == MAX_THROWS;
-        }
-    }
-
-    private boolean checkRegularFrameCompletion() {
-        return isStrike() || getPinsKnockedDown() == MAX_PINS || getThrows().size() == MAX_THROWS;
-    }
-
-
-    private boolean isSpareOnFirstTwoThrows() {
-        List<Integer> throws_ = getThrows();
-        System.out.println("DEBUG isSpareOnFirstTwoThrows FUNCTION CALLED ");
-        return throws_.size() >= 2 &&
-                (throws_.get(0) + throws_.get(1) == MAX_PINS) &&
+    private boolean isFirstTwoThrowsSpare() {
+        return throwList.size() >= 2 &&
+                throwList.get(0) + throwList.get(1) == MAX_PINS &&
                 !isStrike();
-    }
-
-    private boolean isSpareOnThreeThrows() {
-        List<Integer> throws_ = getThrows();
-        return throws_.size() >= 3 &&
-                (throws_.get(0) + throws_.get(1) + throws_.get(2) == MAX_PINS) &&
-                !isStrike();
-    }
-
-    private boolean isRegularFrame() {
-        return !isStrike() && !isSpare();
     }
 
     public boolean isStrike() {
-        if (isLastFrame() && wasStrike) {
-            return true;
-        }
         return !throwList.isEmpty() && throwList.get(0) == MAX_PINS;
     }
     
     public boolean isSpare() {
-        if (isLastFrame() && wasSpare) {
-            return true;
+        if (throwList.size() >= 3) {
+            // For three throws, check if first two throws made a spare
+            if (throwList.get(0) + throwList.get(1) == MAX_PINS && !isStrike()) {
+                return true;
+            }
+            // Check if all three throws made a spare
+            return throwList.get(0) + throwList.get(1) + throwList.get(2) == MAX_PINS &&
+                    !isStrike() &&
+                    throwList.get(0) + throwList.get(1) != MAX_PINS;
+        } else if (throwList.size() >= 2) {
+            // Check for spare in two throws
+            return throwList.get(0) + throwList.get(1) == MAX_PINS && !isStrike();
         }
-        return !isStrike() && throwList.size() >= 2 && getPinsKnockedDown() == MAX_PINS;
+        return false;
     }
 
-    public int getPinsKnockedDown   () {
+    public int getPinsKnockedDown() {
         return throwList.stream().mapToInt(Integer::intValue).sum();
     }
 
@@ -136,24 +127,84 @@ public class Frame {
     }
 
     public int getRemainingPins() {
-        if (isLastFrame()) {
-            if (isStrike() && throwList.size() == 1) {
-                // First throw was a strike, reset pins for second throw
-                return MAX_PINS;
-            } else if (isStrike() && throwList.size() == 2) {
-                // Second throw after strike, calculate remaining pins normally
-                return MAX_PINS - throwList.get(1);
-            } else if (isStrike() && throwList.size() == 3) {
-                // Third throw after strike, calculate remaining pins normally
-                return MAX_PINS - throwList.get(2);
-            } else if (isSpare() && throwList.size() == 2) {
-                // First throw of spare, reset pins for second throw
-                return MAX_PINS;
-            } else if (isSpare() && throwList.size() == 3) {
-                // Second throw after spare, calculate remaining pins normally
-                return MAX_PINS - throwList.get(2);
-            }
+        // For regular frames
+        if (!isLastFrame) {
+            return MAX_PINS - getPinsKnockedDown();
         }
-        return MAX_PINS - getPinsKnockedDown();
+
+        // For the last frame
+        if (isLastFrame) {
+            int currentThrow = throwList.size();
+
+            // After a strike
+            if (currentThrow >= 1 && throwList.get(0) == MAX_PINS) {
+                if (currentThrow == 1) {
+                    // Reset pins after first strike
+                    return MAX_PINS;
+                } else if (currentThrow == 2) {
+                    // If second throw is also a strike, reset pins
+                    if (throwList.get(1) == MAX_PINS) {
+                        return MAX_PINS;
+                    } else {
+                        // Otherwise, calculate remaining pins
+                        return MAX_PINS - throwList.get(1);
+                    }
+                } else if (currentThrow == 3) {
+                    // Before last throw, reset pins if previous was strike
+                    if (throwList.get(1) == MAX_PINS) {
+                        return MAX_PINS;
+                    } else {
+                        // Continue with same frame if no strike in second throw
+                        return MAX_PINS - throwList.get(2);
+                    }
+                }
+            }
+
+            // After a spare (in first two throws)
+            if (currentThrow >= 2 && throwList.get(0) + throwList.get(1) == MAX_PINS && throwList.get(0) != MAX_PINS) {
+                if (currentThrow == 2) {
+                    return MAX_PINS; // Reset pins after a spare
+                } else if (currentThrow == 3) {
+                    // For first bonus throw
+                    if (throwList.get(2) == MAX_PINS) {
+                        return MAX_PINS; // Reset pins after strike
+                    } else {
+                        return MAX_PINS - throwList.get(2);
+                    }
+                } else {
+                    // For second bonus throw
+                    return MAX_PINS - throwList.get(3);
+                }
+            }
+
+            // After a spare (in three throws)
+            if (currentThrow >= 3 &&
+                    throwList.get(0) + throwList.get(1) + throwList.get(2) == MAX_PINS &&
+                    throwList.get(0) != MAX_PINS &&
+                    throwList.get(0) + throwList.get(1) != MAX_PINS) {
+                if (currentThrow == 3) {
+                    return MAX_PINS; // Reset pins after a spare
+                } else if (currentThrow == 4) {
+                    // For first bonus throw
+                    if (throwList.get(3) == MAX_PINS) {
+                        return MAX_PINS; // Reset pins after strike
+                    } else {
+                        return MAX_PINS - throwList.get(3);
+                    }
+                } else {
+                    // For second bonus throw
+                    return MAX_PINS - throwList.get(4);
+                }
+            }
+
+            // Normal calculation for other cases
+            int currentFramePins = 0;
+            for (int i = 0; i < currentThrow && i < 3; i++) {
+                currentFramePins += throwList.get(i);
+            }
+            return MAX_PINS - currentFramePins;
+        }
+
+        return 0; // Default case
     }
 }
