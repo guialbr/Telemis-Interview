@@ -27,4 +27,8 @@ public class OpenAPIConfig {
                 .info(info)
                 .servers(List.of(devServer));
     }
+//Swagger Endpoints:
+//Swagger UI: http://localhost:8080/swagger-ui/index.html
+//OpenAPI JSON: http://localhost:8080/v3/api-docs
+//OpenAPI YAML: http://localhost:8080/v3/api-docs.yaml
 } 

@@ -5,7 +5,7 @@ import org.telemis.bowling.model.Game;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class GameService {
@@ -13,10 +13,10 @@ public class GameService {
     // In-memory storage for games
     private final Map<String, Game> games = new ConcurrentHashMap<>();
 
-    private static final AtomicInteger gameCounter = new AtomicInteger();
+    private final AtomicLong gameCounter = new AtomicLong(0);
 
     public String createGame() {
-        String gameId = UUID.randomUUID().toString();
+        String gameId = String.valueOf(gameCounter.incrementAndGet());
         games.put(gameId, new Game());
         return gameId;
     }
@@ -30,13 +30,24 @@ public class GameService {
     }
 
     public void addPlayer(String gameId, String playerName) {
+        if (playerName == null || playerName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Player name cannot be null or empty");
+        }
         Game game = getGame(gameId);
-        game.addPlayer(playerName);
+        try {
+            game.addPlayer(playerName.trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Failed to add player: " + e.getMessage());
+        }
     }
 
     public void startGame(String gameId) {
         Game game = getGame(gameId);
-        game.start();
+        try {
+            game.start();
+        } catch (IllegalStateException e) {
+            throw new IllegalStateException("Failed to start game: " + e.getMessage());
+        }
     }
 
     public void addThrow(String gameId, int pins) {
@@ -44,10 +55,17 @@ public class GameService {
             throw new IllegalArgumentException("Number of pins must be between 0 and 15");
         }
         Game game = getGame(gameId);
-        game.addThrow(pins);
+        try {
+            game.addThrow(pins);
+        } catch (IllegalStateException e) {
+            throw new IllegalStateException("Failed to add throw: " + e.getMessage());
+        }
     }
 
     public void deleteGame(String gameId) {
+        if (!games.containsKey(gameId)) {
+            throw new IllegalArgumentException("Game not found with ID: " + gameId);
+        }
         games.remove(gameId);
     }
 

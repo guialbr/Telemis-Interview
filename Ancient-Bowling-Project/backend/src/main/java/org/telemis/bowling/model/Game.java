@@ -58,6 +58,12 @@ public class Game {
         if (isStarted) {
             throw new IllegalStateException("Cannot add any players after starting the game");
         }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Player name cannot be null or empty");
+        }
+        if (players.stream().anyMatch(p -> p.getName().equals(name))) {
+            throw new IllegalArgumentException("Player with name '" + name + "' already exists");
+        }
         players.add(new Player(name));
     }
 

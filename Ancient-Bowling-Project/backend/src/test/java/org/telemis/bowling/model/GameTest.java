@@ -209,4 +209,37 @@ class GameTest {
 
         System.out.println("DEBUG: End scoreChartPlayer1");
     }
+
+    /**
+     * Test that duplicate player names are not allowed
+     */
+    @Test
+    void cannotAddDuplicatePlayerNames() {
+        String playerName = "John";
+        game.addPlayer(playerName);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> game.addPlayer(playerName));
+        assertEquals("Player with name 'John' already exists", exception.getMessage());
+    }
+
+    /**
+     * Test that player names cannot be null or empty
+     */
+    @Test
+    void cannotAddInvalidPlayerNames() {
+        // Test null name
+        IllegalArgumentException nullException = assertThrows(IllegalArgumentException.class,
+            () -> game.addPlayer(null));
+        assertEquals("Player name cannot be null or empty", nullException.getMessage());
+
+        // Test empty name
+        IllegalArgumentException emptyException = assertThrows(IllegalArgumentException.class,
+            () -> game.addPlayer(""));
+        assertEquals("Player name cannot be null or empty", emptyException.getMessage());
+
+        // Test whitespace name
+        IllegalArgumentException whitespaceException = assertThrows(IllegalArgumentException.class,
+            () -> game.addPlayer("   "));
+        assertEquals("Player name cannot be null or empty", whitespaceException.getMessage());
+    }
 } 
