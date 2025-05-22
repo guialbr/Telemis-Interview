@@ -4,6 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test suite for the Player class in the Ancient African Bowling Game.
+ * Tests player-specific functionality including:
+ * - Frame management
+ * - Score calculation
+ * - Game completion rules
+ * - Bonus throw handling
+ */
 class PlayerTest {
     private Player player;
 
@@ -13,6 +21,10 @@ class PlayerTest {
         player = new Player("Test Player");
     }
 
+    /**
+     * Tests that a new player starts with one frame and the game is not complete.
+     * Verifies initial state setup for a new player.
+     */
     @Test
     void testNewPlayerHasOneFrame() {
         System.out.println("DEBUG: Start testNewPlayerHasOneFrame");
@@ -21,6 +33,12 @@ class PlayerTest {
         System.out.println("DEBUG: End testNewPlayerHasOneFrame");
     }
 
+    /**
+     * Tests strike scoring rules:
+     * - Strike (15 pins) + next 3 throws
+     * - Verifies correct score calculation for frame with strike
+     * - Checks cumulative scoring across frames
+     */
     @Test
     void testStrikeScore() {
         System.out.println("DEBUG: Start testStrikeScore");
@@ -28,12 +46,18 @@ class PlayerTest {
         player.addThrow(15);
         player.addThrow(3);
         player.addThrow(4);
-        player.addThrow(5 );
+        player.addThrow(5);
         assertEquals(27, player.calculateScore(1)); // should be: 15 + (3 + 4 + 5) = 27
         assertEquals(39, player.calculateScore(2)); // should be: scoreFrame1 + (3 + 4 + 5) = 39
         System.out.println("DEBUG: End testStrikeScore");
     }
 
+    /**
+     * Tests spare scoring rules:
+     * - Spare (15 pins in two throws) + next 2 throws
+     * - Verifies correct score calculation for frame with spare
+     * - Checks proper bonus throw counting
+     */
     @Test
     void testSpareScore() {
         System.out.println("DEBUG: Start testSpareScore");
@@ -50,6 +74,20 @@ class PlayerTest {
         System.out.println("DEBUG: End testSpareScore");
     }
 
+    /**
+     * Tests a complete game with mixed throws:
+     * - Strike, spare, open frame sequence
+     * - Frame-by-frame score calculation
+     * - Final score verification
+     * - Game completion status
+     * Score breakdown:
+     * - Frame 1: Strike (15) + bonus (20) = 35
+     * - Frame 2: Spare (15) + bonus (8) = 23
+     * - Frame 3: Open frame = 10
+     * - Frame 4: Strike (15) + bonus (13) = 28
+     * - Frame 5: Open frame = 13
+     * Total: 109 points
+     */
     @Test
     void testCompleteGame() {
         System.out.println("DEBUG: Start testCompleteGame");
@@ -76,7 +114,7 @@ class PlayerTest {
         // Frame 2: 15 + (5 + 3) = 23
         // Frame 3: 5 + 3 + 2 = 10
         // Frame 4: 15 + (6 + 4 + 3) = 28
-        // Frame 5:  (6 + 4 + 3) = 13
+        // Frame 5: (6 + 4 + 3) = 13
         // Total: 109
         assertEquals(35, player.calculateScore(1));
         assertEquals(58, player.calculateScore(2));
@@ -87,6 +125,13 @@ class PlayerTest {
         System.out.println("DEBUG: End testCompleteGame");
     }
 
+    /**
+     * Tests bonus throws handling for a strike in the last frame:
+     * - Regular frames with consistent scoring
+     * - Strike in last frame
+     * - Three bonus throws allowed
+     * - Game completion verification
+     */
     @Test
     void testBonusThrowsForLastFrameStrike() {
         System.out.println("DEBUG: Start testBonusThrowsForLastFrameStrike");
@@ -109,6 +154,13 @@ class PlayerTest {
         System.out.println("DEBUG: End testBonusThrowsForLastFrameStrike");
     }
 
+    /**
+     * Tests bonus throws handling for a spare in the last frame:
+     * - Regular frames with consistent scoring
+     * - Spare in last frame
+     * - Two bonus throws allowed
+     * - Game completion verification
+     */
     @Test
     void testBonusThrowsForLastFrameSpare() {
         System.out.println("DEBUG: Start testBonusThrowsForLastFrameSpare");
@@ -131,6 +183,12 @@ class PlayerTest {
         System.out.println("DEBUG: End testBonusThrowsForLastFrameSpare");
     }
 
+    /**
+     * Tests that throws are not allowed after game completion:
+     * - Complete game with regular frames
+     * - Verify game completion status
+     * - Ensure additional throws are rejected
+     */
     @Test
     void testCannotThrowAfterGameComplete() {
         System.out.println("DEBUG: Start testCannotThrowAfterGameComplete");
@@ -144,5 +202,45 @@ class PlayerTest {
         assertTrue(player.isGameComplete());
         assertThrows(IllegalStateException.class, () -> player.addThrow(5));
         System.out.println("DEBUG: End testCannotThrowAfterGameComplete");
+    }
+
+    /**
+     * Tests a perfect game where all throws are strikes (300 points).
+     * In the Ancient African Bowling game:
+     * - Each frame has 15 pins
+     * - A strike scores 15 + next 3 throws
+     * - 5 frames total
+     * - Last frame gets 3 bonus throws for strike
+     * Perfect game calculation:
+     * Frames 1-4: 4 × (15 + 45) = 240 points
+     * Frame 5: 15 + (15 + 15 + 15) = 60 points
+     * Total: 300 points
+     */
+    @Test
+    void testPerfectGame() {
+        System.out.println("DEBUG: Start testPerfectGame");
+        
+        // First 4 frames - all strikes
+        for (int i = 0; i < 4; i++) {
+            player.addThrow(15); // Strike
+        }
+        
+        // Last frame - strike + 3 bonus throws
+        player.addThrow(15); // Strike in last frame
+        player.addThrow(15); // First bonus throw
+        player.addThrow(15); // Second bonus throw
+        player.addThrow(15); // Third bonus throw
+        
+        assertTrue(player.isGameComplete());
+        
+        // Verify frame-by-frame scores
+        assertEquals(60, player.calculateScore(1));  // Frame 1: 15 + (15 + 15 + 15) = 60
+        assertEquals(120, player.calculateScore(2)); // Frame 2: 60 + 60 = 120
+        assertEquals(180, player.calculateScore(3)); // Frame 3: 120 + 60 = 180
+        assertEquals(240, player.calculateScore(4)); // Frame 4: 180 + 60 = 240
+        assertEquals(300, player.calculateScore(5)); // Frame 5: 240 + 60 = 300
+        assertEquals(300, player.calculateScore());  // Total score
+        
+        System.out.println("DEBUG: End testPerfectGame");
     }
 } 
