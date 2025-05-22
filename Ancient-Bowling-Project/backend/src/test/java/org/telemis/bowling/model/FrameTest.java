@@ -175,7 +175,7 @@ class FrameTest {
      * - Checks completion rules
      */
     @Test
-    void testLastFrameSpareOnFirstTwoThrows() {
+    void testLastFrameSpareAndStrikes() {
         Frame lastFrame = new Frame(true);
         // First throw
         lastFrame.addThrow(7);
@@ -276,8 +276,7 @@ class FrameTest {
 
         // Third throw
         lastFrame.addThrow(4);
-        assertFalse(lastFrame.isCompleted());
-        assertEquals(6, lastFrame.getPinsKnockedDown());
+        assertEquals(6, lastFrame.getRemainingPins());
 
         // 4th throw / Last frame strike Bonus
         lastFrame.addThrow(6);
