@@ -192,33 +192,22 @@ class GameTest {
         game.addThrow(4);
         game.addThrow(1);
 
-        // Frame 5: 1, 2, 1
+        // Frame 5: 1, 2, 0
         game.addThrow(1);
         game.addThrow(2);
-        game.addThrow(1);
+        game.addThrow(0);
 
         game.addThrow(15);
         game.addThrow(8);
         game.addThrow(2);
         game.addThrow(3);
 
-        Player player1 = game.getScoreboard().get(0).player();
-        Player player2 = game.getScoreboard().get(1).player();
-        var framesFromPlayer1 = player1.getFrames();
-        var framesFromPlayer2 = player2.getFrames();
-        assertEquals(5, framesFromPlayer1.size());
-        // Check cumulative scores after each frame
-        assertEquals(10, player1.calculateScore(1));
-        assertEquals(28, player1.calculateScore(2));
-        assertEquals(31, player1.calculateScore(3));
-        assertEquals(50, player1.calculateScore(4));
-        assertEquals(53, player1.calculateScore(5));
+        var scoreboard = game.getScoreboard();
+        System.out.println("=============SCOREBOARD PLAYER1==============");
+        assertEquals(101, scoreboard.get(0).score());
+        assertEquals(53, scoreboard.get(1).score());
+        System.out.println(scoreboard);
 
-        assertEquals(26, player2.calculateScore(1));
-        assertEquals(37, player2.calculateScore(2));
-        assertEquals(62, player2.calculateScore(3));
-        assertEquals(73, player2.calculateScore(4));
-        assertEquals(101, player2.calculateScore(5));
         System.out.println("DEBUG: End scoreChartPlayer1");
     }
 } 

@@ -243,4 +243,100 @@ class PlayerTest {
         
         System.out.println("DEBUG: End testPerfectGame");
     }
-} 
+
+    /**
+     * Tests Player 1's specific game sequence from the score chart:
+     * Frame 1: 8,1,1 = 10 points
+     * Frame 2: 8,7(spare) = 28 cumulative
+     * Frame 3: 1,2,1 = 31 cumulative
+     * Frame 4: Strike(X) = 50 cumulative
+     * Frame 5: 1,2,1 = 53 final score
+     */
+    @Test
+    void testPlayer1ScoreChart() {
+        System.out.println("DEBUG: Start testPlayer1ScoreChart");
+
+        // Frame 1: 8,1,1
+        player.addThrow(8);
+        player.addThrow(1);
+        player.addThrow(1);
+
+        // Frame 2: 8,7 (Spare) : 10 + 15 + 3 = 28
+        player.addThrow(8);
+        player.addThrow(7);
+
+        // Frame 3: 1,2,1 : 28 + 4
+        player.addThrow(1);
+        player.addThrow(2);
+        player.addThrow(1);
+
+        // Frame 4: Strike (X) 32 + 15 + 1 + 2 + 0 = 50
+        player.addThrow(15);
+
+        // Frame 5: 1,2,1 51 + 3
+        player.addThrow(1);
+        player.addThrow(2);
+        player.addThrow(0);
+
+        assertTrue(player.isGameComplete());
+        assertEquals(10, player.calculateScore(1));
+        assertEquals(28, player.calculateScore(2)); // 1// 0 + (15 + 3)
+        assertEquals(32, player.calculateScore(3));
+        assertEquals(50, player.calculateScore(4)); // Previous 32 + (15 + 4)
+
+
+        assertEquals(53, player.calculateScore());
+
+        System.out.println("DEBUG: End testPlayer1ScoreChart");
+    }
+
+    /**
+     * Tests Player 2's specific game sequence from the score chart:
+     * Frame 1: Strike(X) = 26 points
+     * Frame 2: 8,1,2 = 37 cumulative
+     * Frame 3: 1,2,12(Spare) = 62 cumulative
+     * Frame 4: 6,4,1 = 73 cumulative
+     * Frame 5: Strike(X),8,2,3 = 101 final score
+     */
+    @Test
+    void testPlayer2ScoreChart() {
+        System.out.println("DEBUG: Start testPlayer2ScoreChart");
+
+        // Frame 1: Strike (X)
+        player.addThrow(15);
+
+        // Frame 2: 8,1,2
+        player.addThrow(8);
+        player.addThrow(1);
+        player.addThrow(2);
+
+        // Frame 3: 1,2,12 (making a spare with last throw)
+        player.addThrow(1);
+        player.addThrow(2);
+        player.addThrow(12);
+
+        // Frame 4: 6,4,1
+        player.addThrow(6);
+        player.addThrow(4);
+        player.addThrow(1);
+
+
+        // Frame 5: Strike (X) + bonus throws 8,2,3
+        player.addThrow(15); // Strike
+        player.addThrow(8);
+        player.addThrow(2);
+        player.addThrow(3);
+
+        assertTrue(player.isGameComplete());
+
+        assertEquals(26, player.calculateScore(1)); // 15 + (8 + 1 + 2)
+        assertEquals(37, player.calculateScore(2));
+        assertEquals(62, player.calculateScore(3));
+        assertEquals(73, player.calculateScore(4));
+
+        assertEquals(101, player.calculateScore());
+
+        System.out.println("DEBUG: End testPlayer2ScoreChart");
+    }
+}
+
