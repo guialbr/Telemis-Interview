@@ -11,7 +11,7 @@ public class ConsoleGame {
     private final Scanner scanner;
 
     public ConsoleGame() {
-        this.game = Game.getInstance();
+        this.game = new Game();
         this.scanner = new Scanner(System.in);
     }
 

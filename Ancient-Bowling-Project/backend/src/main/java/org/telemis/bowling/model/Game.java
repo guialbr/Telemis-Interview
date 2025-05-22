@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Singleton class that controls the overall bowling game flow.
+ * Class that controls the overall bowling game flow.
  * <p>
  * It manages players, frames, turns, and score calculation.
  * Each game consists of 5 frames per player, with support for strike/spare bonus rules.
@@ -13,31 +13,18 @@ import java.util.List;
  * </p>
  */
 public class Game {
-    private static Game instance;
     private static final int MIN_PLAYERS = 2;
     private final List<Player> players;
     private int currentPlayerIndex;
     private boolean isStarted;
 
     /**
-     * Private constructor to enforce singleton pattern.
+     * Constructor for creating a new game.
      */
-    private Game() {
+    public Game() {
         this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
         this.isStarted = false;
-    }
-
-    /**
-     * Returns the singleton instance of the game.
-     *
-     * @return the {@code Game} instance
-     */
-    public static Game getInstance() {
-        if (instance == null) {
-            instance = new Game();
-        }
-        return instance;
     }
 
     /**

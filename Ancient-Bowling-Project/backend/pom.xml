@@ -5,16 +5,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.telemis</groupId>
-    <artifactId>ancient-bowling</artifactId>
+    <artifactId>ancient-bowling-api</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <description>Ancient Bowling Game REST API</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <spring.boot.version>3.2.3</spring.boot.version>
         <junit.version>5.10.2</junit.version>
+        <java.version>17</java.version>
     </properties>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.12</version>
+        <relativePath/>
+    </parent>
     <dependencies>
         <!-- Testing -->
         <dependency>
@@ -23,6 +31,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -30,14 +39,29 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Spring Boot (commented out for now, will be used later) -->
-        <!--
+        <!-- Spring Boot (web Framework) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
-        -->
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-validation</artifactId>-->
+        <!--            <version>${spring.boot.version}</version>-->
+        <!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,6 +70,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

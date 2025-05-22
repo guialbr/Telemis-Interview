@@ -40,3 +40,6 @@ replay_pid*
 .DS_Store
 TMRHEDemo on macOS(1).pdf.crdownload.pdf
 TMRHEDemo-install.dmg
+Ancient-Bowling-Project/backend/mvnw
+Ancient-Bowling-Project/backend/mvnw.cmd
+Ancient-Bowling-Project/backend/.mvn/wrapper/maven-wrapper.properties

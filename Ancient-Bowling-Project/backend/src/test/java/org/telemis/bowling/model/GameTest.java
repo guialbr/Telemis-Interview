@@ -14,8 +14,7 @@ class GameTest {
     @BeforeEach
     void setUp() {
         System.out.println("DEBUG: GameTest.setUp");
-        game = Game.getInstance();
-        game.reset();
+        game = new Game();
     }
 
     /**
