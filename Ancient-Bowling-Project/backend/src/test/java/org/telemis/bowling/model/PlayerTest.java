@@ -60,6 +60,7 @@ class PlayerTest {
         player.addThrow(8);
         // Frame 3 - Open
         player.addThrow(5);
+        assertEquals(35, player.calculateScore(1));
         player.addThrow(3);
         player.addThrow(2);
         // Frame 4 - Strike
@@ -71,13 +72,18 @@ class PlayerTest {
         
         assertTrue(player.isGameComplete());
         // Score calculation:
-        // Frame 1: 15 + (7 + 8 + 0) = 30
+        // Frame 1: 15 + (7 + 8 + 5) = 35
         // Frame 2: 15 + (5 + 3) = 23
-        // Frame 3: 10 = 10
+        // Frame 3: 5 + 3 + 2 = 10
         // Frame 4: 15 + (6 + 4 + 3) = 28
-        // Frame 5: 13 = 13
-        // Total: 104
-        assertEquals(104, player.calculateScore());
+        // Frame 5:  (6 + 4 + 3) = 13
+        // Total: 109
+        assertEquals(35, player.calculateScore(1));
+        assertEquals(58, player.calculateScore(2));
+        assertEquals(68, player.calculateScore(3));
+        assertEquals(96, player.calculateScore(4));
+        assertEquals(109, player.calculateScore(5));
+        assertEquals(109, player.calculateScore());
         System.out.println("DEBUG: End testCompleteGame");
     }
 
@@ -117,7 +123,7 @@ class PlayerTest {
         player.addThrow(8); //Spare on 2nd throw
         assertFalse(player.isGameComplete()); // Need bonus throws
 
-        // Bonus throws        boolean enoughFrames = frames.size() >= MAX_FRAMES;
+        // Bonus throws
         player.addThrow(10);
         player.addThrow(5);
         
