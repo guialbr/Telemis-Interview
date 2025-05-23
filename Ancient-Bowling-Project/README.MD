@@ -46,10 +46,6 @@ L'application a été étendue avec une API REST complète :
 #### Architecture MVC
 - **Controllers** : `GameController` gère les endpoints REST
 - **Services** : `GameService` adapte le moteur de jeu pour le web
-- **DTOs** : 
-  - `CreateGameRequest`
-  - `ThrowRequest`
-  - `GameResponse`
 - **Exception Handling** : `GlobalExceptionHandler` pour la gestion des erreurs
 
 ## Technologies Utilisées

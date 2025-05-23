@@ -146,6 +146,11 @@ async function refreshScoreboard() {
         currentPlayer = game.currentPlayer?.name;
         renderScoreboard(scoreboard);
         updatePlayerList();
+
+        if (game.gameComplete && scoreboard.length > 0) {
+            const winner = scoreboard[0]; 
+            alert(`Game Over! ${winner.name} wins with a score of ${winner.score}!`);
+        }
     } catch (error) {
         console.error('Error refreshing scoreboard:', error);
     }
