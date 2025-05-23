@@ -1,70 +1,126 @@
-# Telemis Interview Java R&D Fullstack engineer
-This project consist of the last round interview preparation for Telemis R&D last round interview. It consit of 
-- TMRHE (TeleMis Reception High End) software demo [text](demo_TMRHE.md) 
+# Telemis - Exercice de developpement Java/Web
 
-- A Java web application : 
+## Introduction
 
-## TMRHE Demo 
-Role based interview \ 15 minutes presentation
+Ce projet implémente un jeu de bowling ancien fictif, présumé inspiré de découvertes archéologiques africaines. Il s'agit d'une application web moderne construite en deux phases principales :
 
-I should focus on  the mains Pacs features and functionalities + impact values within the hospitals point of view as well as understand the architecture (class diagrams ?) and technologies useed.
+1. Une implémentation du moteur de jeu en Java pur, suivant les principes de la POO
+2. Une extension web RESTful utilisant Spring Boot
 
-I am the Telemis application engineer presenting Telemis's PACS solution. I should keep a high level presentation but understand in a deeper in case of questions.
- 
- The interviewer will analyse how deep I can answer and present the software. I should focus on presenting main functionalities as well as understand them in a system based paradigm.
+## Architecture de la Solution
 
+### Phase 1 : Moteur de Jeu Core
 
+Le moteur de jeu est construit autour de trois classes principales, comme illustré dans le diagramme UML :
 
-## Web based - Ancient African Bowling Game
+#### 1. Classe `Game`
+- Singleton gérant l'état global du jeu
+- Gère la liste des joueurs et le tour de jeu
+- Attributs principaux :
+  - `players: List<Player>` - Liste des joueurs
+  - `currentPlayerIndex: int` - Index du joueur actuel
+  - `isStarted: boolean` - État du jeu
 
-This project implements the logic and scoring system of a game inspired by ancient African archaeological discoveries, closely resembling modern bowling. The application will be built with:
-- A Java backend, leveraging the Spring Framework and Maven for dependency management and build.
+#### 2. Classe `Player`
+- Représente un joueur et son état dans le jeu
+- Gère les frames du joueur et calcule son score
+- Attributs principaux :
+  - `frames: List<Frame>` - Liste des frames du joueur
+  - `currentFrame: Frame` - Frame actuelle
+  - `name: String` - Nom du joueur
 
-Cahier des charges / the program is designed to:
+#### 3. Classe `Frame`
+- Représente une frame individuelle
+- Gère la logique des lancers et le calcul des points
+- Attributs principaux :
+  - `throwList: List<Integer>` - Liste des lancers
+  - `isCompleted: boolean` - État de complétion
+  - `isLastFrame: boolean` - Indique si c'est la dernière frame
+  - `isStrike: boolean` - Indique un strike
+  - `isSpare: boolean` - Indique un spare
 
-- Calculate the score for each player based on the specific game rules described below.
-- Expose a Java method for submitting each throw:
+### Phase 2 : Extension Web avec Spring Boot
 
-How many players ?  To be determined or checked at compilation range between 2 to X
+L'application a été étendue avec une API REST complète :
 
+#### Architecture MVC
+- **Controllers** : `GameController` gère les endpoints REST
+- **Services** : `GameService` adapte le moteur de jeu pour le web
+- **Exception Handling** : `GlobalExceptionHandler` pour la gestion des erreurs
 
+## Technologies Utilisées
 
-Test driven implementation - To check solution and scores
+- **Java 17** : Langage principal, utilisant les fonctionnalités modernes
+- **Maven** : Gestion des dépendances et build
+- **Spring Boot 3.2.3** : Framework web
+- **JUnit 5.10.2** : Tests unitaires du moteur de jeu
+- **Mockito** : Tests des composants web
+- **Swagger/OpenAPI** : Documentation automatique de l'API
+- **Spring Validation** : Validation des entrées
 
-# Games rules and scoring System
-### Game setup 
-For each players, the goal is to knock down as many pins as possible per frame.
+## API REST
 
-- Each player plays 5 frames
-- Each frame consists of 3 throws
-- After each frame, all 15 pins are reset.
-So 15 throws for each players in the game
+### Endpoints
 
-### Scoring rules:
+| Méthode | Endpoint                                   | Description                          |
+|--------:|:-------------------------------------------|:----|
+| `POST`  | `/api/games`                               | Création d'une nouvelle partie        |
+| `POST`  | `/api/games/{gameId}/players`              | Ajoute un joueur à la partie         |
+| `POST`  | `/api/games/{gameId}/start`                | Démarre une partie existante         |
+| `POST`  | `/api/games/{gameId}/throw`                | Enregistre un lancer                 |
+| `GET`   | `/api/games/{gameId}`                      | Récupère l’état actuel de la partie  |
+| `GET`   | `/api/games/{gameId}/scoreboard`           | Récupère le tableau des scores       |
+## Tests
 
-1. **Regular** Frame: If not all pins are knocked down after 3 throws, the score is the sum of pins knocked down (max 14 points).
+- Tests unitaires complets pour le moteur de jeu
+- Tests d'intégration pour l'API REST
+- Couverture des cas spéciaux (strikes, spares, dernière frame)
 
-2. **Spare**: All 15 pins are knocked down by the second or third throw.
-Score: 15 points + pins from the next **2** throws
-Max possible: 45 points (if next two throws are strikes)
+## Améliorations Futures Possibles
 
-3. **Strike** : All 15 pins are knocked down in the first throw.
-Score: 15 points + pins from the next **3** throws
-Max possible: 60 points (if next two throws are strikes)
+1. **WebSocket Integration**
+   - Jeu en temps réel multi-joueurs
+   - Notifications en direct des actions des joueurs
 
-4. Bonus Throws: If the player make a strike or spare at the last (5th) frame, extra throws are granted to allow for proper score calculation.
+2. **Frontend SPA React**
+   - Interface utilisateur moderne et responsive
+   - Gestion d'état côté client avec Redux/MobX
 
-The final frame can contain up to 4 throws depending on bonus eligibility.
+3. **Persistence des Données**
+   - Intégration d'une base de données H2
+   - Stockage des profils joueurs et statistiques
+   - Historique des parties
 
-Maximum Score : The perfect game score is 300 points.
+## Règles du Jeu
 
-Commit actuel : 5h
+### Configuration
+- 5 frames par joueur
+- 3 lancers par frame
+- 15 quilles à abattre
+- Minimum 2 joueurs
 
+### Système de Score
+1. **Frame Normale** : Somme des quilles (max 14 points)
+2. **Spare** : 15 points + 2 lancers suivants (max 45 points)
+3. **Strike** : 15 points + 3 lancers suivants (max 60 points)
+4. **Score Maximum** : 300 points
 
-# Architecture of the solution
+### Bonus
+- Strike ou Spare à la dernière frame : lancers bonus
+- Maximum 4 lancers dans la dernière frame
 
+## Installation et Démarrage
 
+```bash
+# Cloner le repository
+git clone [url-du-repo]
 
+# Compiler le projet
+mvn clean install
 
-### Telemis Short presentation and notes
-Moto / main values :  Extending Human Life
+# Lancer l'application
+mvn spring-boot:run
+```
+
+L'application sera accessible sur `http://localhost:8080`
+Documentation Swagger sur `http://localhost:8080/swagger-ui.html`
