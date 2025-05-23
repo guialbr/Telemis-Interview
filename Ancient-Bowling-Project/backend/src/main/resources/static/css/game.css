@@ -1,0 +1,91 @@
+body {
+    background-color: #f8f9fa;
+    padding: 60px;
+}
+
+.game-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.game-controls {
+    display: grid;
+    gap: 15px;
+}
+
+.player-list {
+    margin: 15px 0;
+}
+
+.player-item {
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin: 5px 0;
+}
+
+.scoreboard {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.scoreboard-header {
+    background: #007bff;
+    color: white;
+    padding: 10px;
+}
+
+.frame {
+    display: inline-block;
+    border: 1px solid #dee2e6;
+    padding: 8px 15px;
+    margin: 2px;
+    min-width: 80px;
+    text-align: center;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.throws {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.remaining-pins {
+    border-top: 1px dashed #dee2e6;
+    padding-top: 5px;
+    color: #999;
+    font-size: 0.875rem;
+    font-style: italic;
+}
+
+.strike {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.spare {
+    color: #17a2b8;
+    font-weight: bold;
+}
+
+.game-status {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.game-status.active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.game-status.inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}

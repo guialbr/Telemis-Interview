@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telemis Ancient Bowling</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/game.css">
+    <script src="/js/game.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">🎳 Telemis Ancient Bowling</h1>
+        
+        <div class="game-section">
+            <h3>Game Setup</h3>
+            <div class="game-controls">
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-primary w-100" onclick="createGame()">Create New Game</button>
+                    </div>
+                    <div class="col">
+                        <div class="game-status" id="gameStatus">
+                            Game ID: <span id="gameId">None</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input id="playerName" class="form-control" placeholder="Enter player name" />
+                    <button class="btn btn-success" onclick="addPlayer()">Add Player</button>
+                </div>
+
+                <button class="btn btn-info" onclick="startGame()">Start Game</button>
+            </div>
+
+            <div class="player-list" id="playerList">
+                <h4>Players:</h4>
+                <!-- Players will be added here dynamically -->
+            </div>
+        </div>
+
+        <div class="game-section">
+            <h3>Game Play</h3>
+            <div class="game-controls">
+                <div class="input-group">
+                    <input id="throwPins" type="number" class="form-control" min="0" max="15" placeholder="Pins knocked (0-15)" />
+                    <button class="btn btn-primary" onclick="makeThrow()">Make Throw</button>
+                </div>
+                <button class="btn btn-light" onclick="refreshScoreboard()">Refresh Scoreboard</button>
+            </div>
+        </div>
+
+        <div class="game-section">
+            <h3>Scoreboard</h3>
+            <div id="scoreboard" class="scoreboard"></div>
+        </div>
+    </div>
+
+    <footer class="container-fluid text-muted">
+        <hr class="featurette-divider">
+        <!--<p class="float-end"><a href="#">Back to top</a></p> -->
+        <p>&copy;May 2025  &middot; Telemis home assignment &middot; Guillaume Alber </p>
+    </footer>
+
+</body>
+</html>
