@@ -1,4 +1,4 @@
-# API REST – Jeu de Quilles Africain Ancien
+# API REST – Jeu Bowling Antique
 
 Cette API REST permet de gérer une version traditionnelle du jeu de quilles africain. Chaque manche débute avec **15 quilles**, et des **bonus** sont attribués en cas de **strike** ou **spare**, selon des règles spécifiques.
 
