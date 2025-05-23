@@ -1,1 +1,0 @@
-# TeleMis Reception High End
